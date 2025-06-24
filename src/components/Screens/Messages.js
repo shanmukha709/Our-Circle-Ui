@@ -15,7 +15,7 @@ const Messages = () => {
   useEffect(() => {
     if (sender) {
       axios
-        .get(`http://localhost:8083/chat/conversations/${sender}`)
+        .get(`https://chat-service-z1y7.onrender.com/chat/conversations/${sender}`)
         .then((res) => {
           setConversations(res.data);
           if (!selectedUser && res.data.length > 0) {
@@ -31,7 +31,7 @@ const Messages = () => {
   useEffect(() => {
     if (sender && selectedUser) {
       axios
-        .get(`http://localhost:8083/chat/history/${sender}/${selectedUser}`)
+        .get(`https://chat-service-z1y7.onrender.com/chat/history/${sender}/${selectedUser}`)
         .then((res) => setChat(res.data))
         .catch((err) => console.error('Chat fetch error:', err));
     }
@@ -52,7 +52,7 @@ const Messages = () => {
     };
 
     axios
-      .post('http://localhost:8083/chat/send', msgObj)
+      .post('https://chat-service-z1y7.onrender.com/chat/send', msgObj)
       .then((res) => {
         setChat((prev) => [...prev, res.data]);
         setMessage('');
