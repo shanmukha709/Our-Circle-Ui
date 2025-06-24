@@ -1,6 +1,6 @@
 import React from 'react';
 import { FaUser, FaStickyNote, FaUsers, FaEnvelope } from 'react-icons/fa';
-import 'C:/Users/upend/shannu/ourcircle/src/components/BottomNav/BottomNav.css';
+import './BottomNav.css';
 
 const BottomNav = ({ selectedTab, setSelectedTab }) => {
   return (

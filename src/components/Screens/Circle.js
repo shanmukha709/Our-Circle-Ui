@@ -34,7 +34,7 @@ const Circle = () => {
 
       if (citizen.designationId && !designationDetailsMap[citizen.designationId]) {
         try {
-          const res = await axios.get(`http://localhost:8081/designation/${citizen.designationId}`);
+          const res = await axios.get(`https://designation-service-ci54.onrender.com/designation/${citizen.designationId}`);
           setDesignationDetailsMap(prev => ({ ...prev, [citizen.designationId]: res.data }));
         } catch (error) {
           console.error("Error fetching designation details:", error);
