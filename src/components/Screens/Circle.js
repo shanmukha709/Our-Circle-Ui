@@ -1,16 +1,26 @@
+// src/components/Screens/Circle.js
+
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import { useNavigate } from 'react-router-dom'; // ✅ Must be at top level
+import axios, {
+  CITIZEN_SERVICE_BASE_URL,
+  DESINATION_SERVICE_BASE_URL
+} from '../api/axios';
+
 import '../screens-styles/circle.css';
 import { FaComments } from 'react-icons/fa';
 
 const Circle = () => {
+  const navigate = useNavigate(); // ✅ React Hook must be top-level
+
   const [citizens, setCitizens] = useState([]);
   const [expandedCardId, setExpandedCardId] = useState(null);
   const [areaDetailsMap, setAreaDetailsMap] = useState({});
   const [designationDetailsMap, setDesignationDetailsMap] = useState({});
 
   useEffect(() => {
-    axios.get('https://designation-service.onrender.com/citizen')
+    axios
+      .get(`${CITIZEN_SERVICE_BASE_URL}/citizen`)
       .then(response => setCitizens(response.data))
       .catch(error => console.error("Error fetching citizens:", error));
   }, []);
@@ -25,7 +35,7 @@ const Circle = () => {
 
       if (citizen.areaId && !areaDetailsMap[citizen.areaId]) {
         try {
-          const res = await axios.get(`https://designation-service.onrender.com/areas/${citizen.areaId}`);
+          const res = await axios.get(`${CITIZEN_SERVICE_BASE_URL}/areas/${citizen.areaId}`);
           setAreaDetailsMap(prev => ({ ...prev, [citizen.areaId]: res.data }));
         } catch (error) {
           console.error("Error fetching area details:", error);
@@ -34,7 +44,7 @@ const Circle = () => {
 
       if (citizen.designationId && !designationDetailsMap[citizen.designationId]) {
         try {
-          const res = await axios.get(`https://designation-service-ci54.onrender.com/designation/${citizen.designationId}`);
+          const res = await axios.get(`${DESINATION_SERVICE_BASE_URL}/designation/${citizen.designationId}`);
           setDesignationDetailsMap(prev => ({ ...prev, [citizen.designationId]: res.data }));
         } catch (error) {
           console.error("Error fetching designation details:", error);
@@ -48,7 +58,7 @@ const Circle = () => {
     if (!citizen?.username) return;
     localStorage.setItem("chatUser", citizen.username);
     localStorage.setItem("selectedTab", "messages");
-    window.location.reload();
+    navigate(`/messages/${citizen.username}`); // ✅ useNavigate used correctly
   };
 
   return (
@@ -75,12 +85,10 @@ const Circle = () => {
 
               {isExpanded && (
                 <div className="circle-extra">
-                  <p><strong>Age : </strong> {citizen.age}</p>
-                  <p><strong>Gender : </strong>{citizen.gender}</p>
-                  <p><strong>Area Name : </strong> {areaDetails.name}</p>
-                  {/* <p><strong>Area About : </strong>{areaDetails.description || areaDetails.about}</p> */}
-                  <p><strong>Profession : </strong> {designationDetails.profession}</p>
-                  {/* <p><strong>Profession About : </strong>{designationDetails.about}</p> */}
+                  <p><strong>Age:</strong> {citizen.age}</p>
+                  <p><strong>Gender:</strong> {citizen.gender}</p>
+                  <p><strong>Area:</strong> {areaDetails.name || '-'}</p>
+                  <p><strong>Profession:</strong> {designationDetails.profession || '-'}</p>
 
                   <div className="chat-icon-wrapper">
                     <FaComments className="chat-icon" onClick={(e) => handleChatClick(e, citizen)} />

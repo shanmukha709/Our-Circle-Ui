@@ -1,5 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import axios from '../api/axios';
+import axios, {
+  DESINATION_SERVICE_BASE_URL,
+  CITIZEN_SERVICE_BASE_URL
+} from '../api/axios';
+
 import { jwtDecode } from 'jwt-decode';
 import '../../components/screens-styles/profile.css';
 
@@ -45,7 +49,7 @@ const Profile = () => {
 
   const fetchCitizen = async (username) => {
     try {
-      const res = await axios.get(`/citizen/username/${username}`);
+      const res = await axios.get(`${CITIZEN_SERVICE_BASE_URL}/citizen/username/${username}`);
       const citizen = res.data;
 
       setFormData({
@@ -72,7 +76,7 @@ const Profile = () => {
 
   const fetchAreas = async () => {
     try {
-      const res = await axios.get('/areas');
+      const res = await axios.get(`${CITIZEN_SERVICE_BASE_URL}/areas`);
       setAreas(res.data);
     } catch (err) {
       console.error('Failed to load areas');
@@ -81,7 +85,7 @@ const Profile = () => {
 
   const fetchProfessions = async () => {
     try {
-      const res = await axios.get('https://designation-service-ci54.onrender.com/designation');
+      const res = await axios.get(`${DESINATION_SERVICE_BASE_URL}/designation`);
       setProfessions(res.data);
     } catch (err) {
       console.error('Failed to load professions');
@@ -118,10 +122,10 @@ const Profile = () => {
       };
 
       if (profileExists && isEditing) {
-        await axios.put('/citizen', citizenPayload);
+        await axios.put(`${CITIZEN_SERVICE_BASE_URL}/citizen`, citizenPayload);
         alert('Profile updated successfully!');
       } else {
-        await axios.post('/citizen', citizenPayload);
+        await axios.post(`${CITIZEN_SERVICE_BASE_URL}/citizen`, citizenPayload);
         alert('Profile submitted successfully!');
       }
 

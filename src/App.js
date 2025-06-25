@@ -1,78 +1,68 @@
 import React, { useEffect, useState } from 'react';
+import { BrowserRouter as Router, useNavigate } from 'react-router-dom';
 import AnimatedIntro from './components/AnimatedIntro/AnimatedIntro';
+import AppRoutes from './components/routes/AppRoutes';
 import BottomNav from './components/BottomNav/BottomNav';
-import Profile from './components/Screens/Profile';
-import Posts from './components/Screens/Posts';
-import Circle from './components/Screens/Circle';
-import Messages from './components/Screens/Messages';
-import AuthContainer from './components/auth/AuthContainer'; 
-// import './App.css';
 
-function App() {
-  const [selectedTab, setSelectedTab] = useState(localStorage.getItem('selectedTab') || 'posts');
+function AppWrapper() {
   const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem('jwtToken'));
   const [showIntro, setShowIntro] = useState(false);
-
-  useEffect(() => {
-    localStorage.setItem('selectedTab', selectedTab);
-  }, [selectedTab]);
+  const navigate = useNavigate();
 
   const handleLogin = () => {
     setIsAuthenticated(true);
     setShowIntro(true);
-
     setTimeout(() => {
       setShowIntro(false);
       localStorage.setItem('showIntroDone', 'true');
+      navigate('/posts');
     }, 4000);
   };
 
+  const handleLogout = () => {
+    localStorage.clear();
+    setIsAuthenticated(false);
+    navigate('/login');
+  };
+
   useEffect(() => {
-    if (localStorage.getItem('jwtToken') && localStorage.getItem('showIntroDone') === 'true') {
+    const token = localStorage.getItem('jwtToken');
+    const introDone = localStorage.getItem('showIntroDone') === 'true';
+    if (token && introDone) {
       setIsAuthenticated(true);
-      setShowIntro(false);
     }
   }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem('jwtToken');
-    localStorage.removeItem('showIntroDone');
-    setIsAuthenticated(false);
-    setSelectedTab('posts');
-  };
-
-  const renderContent = () => {
-    switch (selectedTab) {
-      case 'profile': return <Profile />;
-      case 'posts': return <Posts />;
-      case 'circle': return <Circle />;
-      case 'messages': return <Messages />;
-      default: return <Posts />;
-    }
-  };
+  if (showIntro) return <AnimatedIntro />;
 
   return (
-    <div className="App">
-      {!isAuthenticated ? (
-        <AuthContainer onLogin={handleLogin} />
-      ) : showIntro ? (
-        <AnimatedIntro />
-      ) : (
-        <>
-          <button onClick={handleLogout} className="logout-btn">
-            Logout
-          </button>
-
-          <div className="app-body">
-            <div className="content-area">
-              {renderContent()}
-            </div>
-            <BottomNav selectedTab={selectedTab} setSelectedTab={setSelectedTab} />
-          </div>
-        </>
+    <div className="app-wrapper">
+      {isAuthenticated && (
+        <button onClick={handleLogout} className="logout-btn">Logout</button>
       )}
+      <AppRoutes isAuthenticated={isAuthenticated} onLogin={handleLogin} />
+      <BottomNavWrapper />
     </div>
   );
 }
+
+function App() {
+  return (
+    <Router>
+      <AppWrapper />
+    </Router>
+  );
+}
+
+const BottomNavWrapper = () => {
+  const currentPath = window.location.pathname;
+  const visibleRoutes = ['/posts', '/messages', '/circle', '/profile'];
+  return visibleRoutes.some(path => currentPath.startsWith(path)) ? (
+    <BottomNav
+      selectedTab={currentPath.slice(1)}
+      setSelectedTab={(tab) => (window.location.href = `/${tab}`)}
+    />
+  ) : null;
+};
 
 export default App;

@@ -1,5 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
-import axios from 'axios';
+import axios, {
+  CHAT_SERVICE_BASE_URL,
+} from '../api/axios';
 import '../screens-styles/messages.css';
 
 const Messages = () => {
@@ -15,7 +17,7 @@ const Messages = () => {
   useEffect(() => {
     if (sender) {
       axios
-        .get(`https://chat-service-z1y7.onrender.com/chat/conversations/${sender}`)
+        .get(`${CHAT_SERVICE_BASE_URL}/chat/conversations/${sender}`)
         .then((res) => {
           setConversations(res.data);
           if (!selectedUser && res.data.length > 0) {
@@ -31,7 +33,7 @@ const Messages = () => {
   useEffect(() => {
     if (sender && selectedUser) {
       axios
-        .get(`https://chat-service-z1y7.onrender.com/chat/history/${sender}/${selectedUser}`)
+        .get(`${CHAT_SERVICE_BASE_URL}/chat/history/${sender}/${selectedUser}`)
         .then((res) => setChat(res.data))
         .catch((err) => console.error('Chat fetch error:', err));
     }
@@ -52,7 +54,7 @@ const Messages = () => {
     };
 
     axios
-      .post('https://chat-service-z1y7.onrender.com/chat/send', msgObj)
+      .post(`${CHAT_SERVICE_BASE_URL}/chat/send`, msgObj)
       .then((res) => {
         setChat((prev) => [...prev, res.data]);
         setMessage('');
